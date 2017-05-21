@@ -1,0 +1,36 @@
+<ion-grid>
+  <ion-row>
+      <div class="login">
+        <div class="centered">
+          <img src="../../assets/pile-of-boxes.webp" >
+        </div>
+        <ion-list inset>
+
+            <ion-item>
+                <ion-label floating>Username</ion-label>
+                <ion-input type="text" [(ngModel)]="loginData.username"></ion-input>
+            </ion-item>
+
+            <ion-item>
+                <ion-label floating>Password</ion-label>
+                <ion-input type="password" [(ngModel)]="loginData.password"></ion-input>
+            </ion-item>
+
+            <ion-item></ion-item>
+
+        </ion-list>
+      </div>
+  </ion-row>
+  <ion-row justify-content-center>
+    <div style="text-align: center">
+      <ion-spinner name="circles" *ngIf="loading"></ion-spinner>
+    </div>
+  </ion-row>
+  <ion-row justify-content-center>
+    <div style="text-align: center">
+      <button ion-button outline (click)="login()" [disabled]="loading">Log in</button>
+    </div>
+  </ion-row>
+
+</ion-grid>
+

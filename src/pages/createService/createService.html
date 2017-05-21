@@ -1,0 +1,129 @@
+<ion-header xmlns="http://www.w3.org/1999/html">
+  <ion-navbar>
+    <ion-title>
+      Crear servicio
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <form [formGroup]="formCreateService">
+    <ion-grid>
+      <ion-row justify-content-center>
+        <ion-col col-sm-7 col-12>
+          <ion-list>
+            <ion-item-divider>
+              <div class="centered">Detalles de destino</div>
+            </ion-item-divider>
+            <ion-item>
+              <ion-label color="primary" stacked>Dirección</ion-label>
+              <ion-input placeholder="Cra 123 # 32 65" [value]="locations.destino.address" disabled></ion-input>
+              <ion-icon name="locate" item-right></ion-icon>
+            </ion-item>
+            <ion-item>
+              <ion-label color="primary" stacked>Nombre del destinatario</ion-label>
+              <ion-input placeholder="Nombre de quién recibe el paquete" formControlName="toName"></ion-input>
+            </ion-item>
+            <p class="error"
+               *ngIf="!formCreateService.controls.toName.valid && (formCreateService.controls.toName.dirty
+                 || formCreateService.controls.toName.touched || submitAttempt)">
+              Por favor ingrese el nombre de la persona que recibirá el paquete.
+            </p>
+            <ion-item>
+              <ion-label color="primary" stacked>Tipod e identificación</ion-label>
+              <ion-input placeholder="CC" formControlName="toIdType"></ion-input>
+            </ion-item>
+            <p class="error"
+               *ngIf="!formCreateService.controls.toIdType.valid && (formCreateService.controls.toIdType.dirty
+                 || formCreateService.controls.toIdType.touched || submitAttempt)">
+              Por favor ingrese el tipod de identifiación de la persona que recibirá el paquete.
+            </p>
+            <ion-item>
+              <ion-label color="primary" stacked>Identificación del destinatario</ion-label>
+              <ion-input placeholder="1010123123" formControlName="toId"></ion-input>
+            </ion-item>
+            <p class="error"
+               *ngIf="!formCreateService.controls.toId.valid && (formCreateService.controls.toId.dirty
+                 || formCreateService.controls.toId.touched || submitAttempt)">
+              Por favor ingrese el número de identificación de la persona que recibirá el paquete.
+            </p>
+            <ion-item>
+              <ion-label color="primary" stacked>Identificación del destinatario</ion-label>
+              <ion-input placeholder="300 543 0987" formControlName="toNumTel"></ion-input>
+            </ion-item>
+            <p class="error"
+               *ngIf="!formCreateService.controls.toNumTel.valid && (formCreateService.controls.toNumTel.dirty
+                 || formCreateService.controls.toNumTel.touched || submitAttempt)">
+              Por favor ingrese el número de telefono de la persona que recibirá el paquete.
+            </p>
+            <br>
+            <ion-item-divider>
+              <div class="centered" >Detalles del paquete</div>
+            </ion-item-divider>
+            <ion-item>
+              <ion-label color="primary" stacked>Declaración de contenido</ion-label>
+              <ion-textarea  placeholder="Descripción del contenido del paquete." formControlName="contentDeclaration"></ion-textarea>
+            </ion-item>
+            <p class="error"
+               *ngIf="!formCreateService.controls.contentDeclaration.valid && (formCreateService.controls.contentDeclaration.dirty
+                 || formCreateService.controls.contentDeclaration.touched || submitAttempt)">
+              La declaración de contenido es obligatoria.
+            </p>
+            <ion-item>
+              <ion-label color="primary" stacked>Valor declarado</ion-label>
+              <ion-input type="numeric" placeholder="5.00" formControlName="valueDeclaration"></ion-input>
+            </ion-item>
+            <p class="error"
+               *ngIf="!formCreateService.controls.valueDeclaration.valid && (formCreateService.controls.valueDeclaration.dirty
+                 || formCreateService.controls.valueDeclaration.touched || submitAttempt)">
+              El valor declarado es obligatorio, si no desea obtener un seguro deje el valor como 0.
+            </p>
+            <ion-row>
+              <ion-col col-3>
+                <div style="padding-left: 16px">
+                  <ion-label color="primary">Dimensiones</ion-label>
+                </div>
+              </ion-col>
+              <ion-col col-3>
+                <div class="centered">
+                  <button ion-button [color]="dimensiones[0]" full round (click)="selectDimension(0)">Pequeño</button>
+                </div>
+              </ion-col>
+              <ion-col col-3>
+                <div class="centered">
+                  <button ion-button [color]="dimensiones[1]" full round (click)="selectDimension(1)">Mediano</button>
+                </div>
+              </ion-col>
+              <ion-col col-3>
+                <div class="centered">
+                  <button ion-button [color]="dimensiones[2]" full round (click)="selectDimension(2)">Grande</button>
+                </div>
+              </ion-col>
+            </ion-row>
+            <br>
+            <ion-item-divider>
+              <div class="centered" >Detalles del paquete</div>
+            </ion-item-divider>
+            <ion-label>* El valor del seguro corresponde al 10% del valor declarado.</ion-label>
+            <ion-label>* La tarjeta de pago para este servicio es: VISA ****7333 .</ion-label>
+            <br>
+            <ion-row justify-content-center>
+              <div style="text-align: center">
+                <ion-spinner name="circles" *ngIf="loading"></ion-spinner>
+              </div>
+            </ion-row>
+            <ion-row justify-content-center>
+              <ion-col col-4>
+                <div class="centered">
+                  <button ion-button  round outline (click)="createService()" [disabled]="loading">
+                    <ion-label>Buscar </ion-label>
+                    <ion-icon name="search"></ion-icon>
+                  </button>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>

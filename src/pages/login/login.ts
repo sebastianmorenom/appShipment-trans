@@ -22,8 +22,8 @@ export class Login {
 
   constructor(private http:Http, private navCtrl: NavController, private appShipmentService: AppShipmentService,
               private alertCtrl: AlertController, private googleMapServices:GoogleMapServices) {
-    this.loginData.username = "fizz@seajoker.com";
-    this.loginData.password = "fizz";
+    this.loginData.username = "jax@handmaster.com";
+    this.loginData.password = "jax";
     this.loading = false;
   }
 

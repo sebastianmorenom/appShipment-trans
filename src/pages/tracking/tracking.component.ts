@@ -1,8 +1,6 @@
 import {Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef} from "@angular/core";
 import {AlertController, NavController, NavParams} from 'ionic-angular';
-import { Geolocation } from 'ionic-native';
 import {AppShipmentService} from "../../app/services/appShipment.service";
-import { CreateService } from '../createService/createService.component'
 import {GoogleMapServices} from "../../app/services/googleMap.services";
 
 declare let google;

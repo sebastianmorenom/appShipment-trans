@@ -2,7 +2,6 @@ import {Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef} from "@angu
 import {AlertController, NavController, NavParams} from 'ionic-angular';
 import { Geolocation } from 'ionic-native';
 import {AppShipmentService} from "../../app/services/appShipment.service";
-import { CreateService } from '../createService/createService.component'
 import {GoogleMapServices} from "../../app/services/googleMap.services";
 
 declare let google;
@@ -191,7 +190,7 @@ export class Home implements OnInit{
           address:this.markerDestinoAddress
         }
       };
-      this.navCtrl.push(CreateService, {user:this.user, locations:locations});
+      //this.navCtrl.push(CreateService, {user:this.user, locations:locations});
     }
     else {
       this.presentAlert();

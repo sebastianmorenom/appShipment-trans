@@ -32,8 +32,6 @@ export class Home implements OnInit{
   user:any;
   locations:any;
 
-  info:any;
-
   constructor(public navCtrl: NavController, private appShipmentService:AppShipmentService, private alertCtrl: AlertController,
               private navParams:NavParams, private googleMapServide:GoogleMapServices,
               private changeDetection: ChangeDetectorRef) {

@@ -2,6 +2,7 @@ import {Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef} from "@angu
 import {AlertController, NavController, NavParams} from 'ionic-angular';
 import {AppShipmentService} from "../../app/services/appShipment.service";
 import {GoogleMapServices} from "../../app/services/googleMap.services";
+import { Geolocation } from 'ionic-native';
 
 declare let google;
 
@@ -24,12 +25,9 @@ export class Tracking implements OnInit{
   iconUserDetailTo:any;
   iconTransDetail:any;
   iconTrans:any;
-  data:any;
   user:any;
   activeService:any;
-  locations:any;
-
-  info:any;
+  transporterPosTask:any;
 
   constructor(public navCtrl: NavController, private appShipmentService:AppShipmentService, private alertCtrl: AlertController,
               private navParams:NavParams, private googleMapServide:GoogleMapServices,
@@ -43,7 +41,7 @@ export class Tracking implements OnInit{
     this.iconTrans = {url: '/assets/icon/car.png'};
     this.user = navParams.get('user');
     this.activeService = navParams.get('activeService');
-    console.log(this.activeService);
+    console.log(this.user);
   }
 
   ngOnInit(){
@@ -67,6 +65,9 @@ export class Tracking implements OnInit{
     this.addMarkerWithPos(1, origenPos);
     this.addMarkerWithPos(2, destinoPos);
     this.loadTransMasrker(transPos);
+    this.transporterPosTask = setInterval(()=>{
+      this.setTransporterPos();
+    },10000);
   };
 
   addMarkerCenterMap(opt){
@@ -113,7 +114,7 @@ export class Tracking implements OnInit{
   }
 
   loadTransMasrker(pos){
-    this.putMarker(this.map, this.markerTrans, pos, this.iconTransDetail);
+    this.markerTrans = this.putMarker(this.map, this.markerTrans, pos, this.iconTransDetail);
   }
 
   getDirections(){
@@ -141,6 +142,38 @@ export class Tracking implements OnInit{
       alert("Cant retrieve routes");
     }
   };
+
+  getTransporterPos(){
+    this.appShipmentService.getTransporterById({id:this.activeService.transporter.id}).subscribe(
+      (response) => {
+        this.activeService.transporter = response;
+        console.log(this.activeService);
+        this.updateTransporterMarker();
+      }
+    );
+  }
+
+  setTransporterPos(){
+    Geolocation.getCurrentPosition().then(
+      (position) => {
+        let data = {
+          username:this.user.username,
+          lat:position.coords.latitude,
+          lng:position.coords.longitude
+        };
+        this.appShipmentService.updateLatLng(data).subscribe(
+          (response) => {
+            console.log(response);
+            this.getTransporterPos();
+          }
+        );
+      });
+  };
+
+  updateTransporterMarker(){
+    let pos = new google.maps.LatLng(this.activeService.transporter.pos.lat, this.activeService.transporter.pos.lng);
+    this.markerTrans.setPosition(pos);
+  }
 
   presentAlert() {
     let alert = this.alertCtrl.create({

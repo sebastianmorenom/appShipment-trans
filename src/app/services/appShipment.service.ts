@@ -68,4 +68,15 @@ export class AppShipmentService {
     );
   }
 
+  updateLatLng(data){
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions ({ headers: headers });
+    return this.http.post(this.url+"/localizacion/update", data, options).map(
+      (response:Response) => {
+        const data = response;
+        return data;
+      }
+    );
+  }
+
 }

@@ -1,8 +1,10 @@
 <ion-header xmlns="http://www.w3.org/1999/html">
   <ion-navbar>
-    <ion-title>
-      En servicio...
-    </ion-title>
+    <ion-title>En servicio...</ion-title>
+    <ion-buttons ></ion-buttons>
+    <div class="centered" *ngIf="arrivalTime !== null">
+      <span>Tiempo estimado para el trayecto: </span> <ion-label color="primary" >{{arrivalTime}}</ion-label>
+    </div>
     <ion-buttons end>
       <button ion-button (click)="loadMap()"><ion-icon name="map"></ion-icon>&nbsp;Load MAP</button>
     </ion-buttons>
@@ -11,7 +13,7 @@
 
 <ion-content>
   <div #map id="map"></div>
-
+  <!--<div #directionsPanel id="directionsPanel" style="float:left;width:30%;height:80%"></div>-->
   <ion-grid>
     <ion-row>
       <ion-col col-sm-12 col-md-4 offset-md-4>
@@ -24,8 +26,7 @@
           </ion-col>
           <ion-col col-1>
             <ion-fab center middle="">
-              <button ion-fab mini [color]="(markerOption==1)?'primary':'light'"
-                      (click)="changeMarkersPosition(1)"><ion-icon name="locate"></ion-icon></button>
+              <button ion-fab mini [color]="(markerOption==1)?'primary':'light'"><ion-icon name="locate"></ion-icon></button>
             </ion-fab>
           </ion-col>
         </ion-row>
@@ -38,36 +39,50 @@
           </ion-col>
           <ion-col col-1>
             <ion-fab center middle="">
-              <button ion-fab mini [color]="(markerOption==2)?'primary':'light'"
-                      (click)="changeMarkersPosition(2)"><ion-icon name="locate"></ion-icon></button>
+              <button ion-fab mini [color]="(markerOption==2)?'primary':'light'"><ion-icon name="locate"></ion-icon></button>
             </ion-fab>
           </ion-col>
         </ion-row>
       </ion-col>
     </ion-row>
+    <ion-row justify-content-center>
+      <div style="text-align: center">
+        <ion-spinner name="circles" *ngIf="loading"></ion-spinner>
+      </div>
+    </ion-row>
+    <ion-row>
+      <ion-col col-sm-12 col-md-4 offset-md-4>
+        <button ion-button *ngIf="activeService.status==='AC' && !packagePickedUp && !deliveredPackage" color="success"
+                (click)="pickUpPackage(markerTrans, markerOrigen)" full [disabled]="loading">
+          <ion-icon name="car"></ion-icon>&nbsp;Recoger paquete
+        </button>
+        <button ion-button *ngIf="packagePickedUp && !deliveredPackage" color="secondary"
+                (click)="deliveryPackage(markerOrigen, markerDestino)" full [disabled]="loading">
+          <ion-icon name="car"></ion-icon>&nbsp;Empezar servicio
+        </button>
+        <button ion-button *ngIf="deliveredPackage" color="danger"
+                (click)="finishService()" full [disabled]="loading">
+          <ion-icon name="car"></ion-icon>&nbsp;Terminar servicio
+        </button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col col-sm-6 col-md-4 offset-md-4>
+        <ion-label color="primary">
+          Datos del destinatario:
+        </ion-label>
+      </ion-col>
+    </ion-row>
     <ion-row>
       <ion-col col-sm-6 col-md-2 offset-md-4>
         <div class="centered">
-          <img [src]="iconTrans.url">
-          <ion-row>
-            <ion-col >
-              <span>{{activeService.transporter.carDetail.marca}} - {{activeService.transporter.carDetail.reference}}</span>
-            </ion-col>
-            <ion-col >
-              <span>{{activeService.transporter.carDetail.placa}}</span>
-            </ion-col>
-          </ion-row>
+          <h5><ion-icon name="person"></ion-icon>&nbsp;{{activeService.addressee.name}}</h5>
+          <span>{{activeService.addressee.idType}} - {{activeService.addressee.id}}</span>
         </div>
       </ion-col>
       <ion-col col-sm-6 col-md-2>
-        <div style="padding-left: 5px">
-            <ion-col>
-              <div style="padding-left: 15px">
-                <h4><ion-icon name="person"></ion-icon>&nbsp;{{activeService.transporter.name}}</h4>
-                <h5><ion-icon name="star-half"></ion-icon>&nbsp;{{activeService.transporter.calificacion}}</h5>
-                <button ion-button (click)="getDirections()"><ion-icon name="car"></ion-icon>&nbsp;Direcciones</button>
-              </div>
-            </ion-col>
+        <div class="centered">
+          <h5><ion-icon name="phone-portrait"></ion-icon>&nbsp;{{activeService.addressee.numTel}}</h5>
         </div>
       </ion-col>
     </ion-row>

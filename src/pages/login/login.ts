@@ -53,7 +53,7 @@ export class Login {
           this.googleMapServices.getAddressFromLatLng(this.activeService.origen.lat, this.activeService.origen.lng).subscribe(
             dataOrigen => {
               this.activeService.origen.address = dataOrigen.results[0].formatted_address;
-              this.googleMapServices.getAddressFromLatLng(this.activeService.origen.lat, this.activeService.origen.lng).subscribe(
+              this.googleMapServices.getAddressFromLatLng(this.activeService.destino.lat, this.activeService.destino.lng).subscribe(
                 dataDestino => {
                   this.activeService.destino.address = dataDestino.results[0].formatted_address;
                   this.navCtrl.setRoot(Tracking, {user:userInfo, activeService:this.activeService});

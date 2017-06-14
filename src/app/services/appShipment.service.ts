@@ -60,7 +60,7 @@ export class AppShipmentService {
   getActiveService(data){
     let headers = new Headers({ 'Content-Type': 'application/json' });
     let options = new RequestOptions ({ headers: headers });
-    return this.http.post(this.url+"/services/activeService", data, options).map(
+    return this.http.post(this.url+"/services/activeService/trans", data, options).map(
       (response:Response) => {
         const data = response.json();
         return data;
@@ -74,6 +74,28 @@ export class AppShipmentService {
     return this.http.post(this.url+"/localizacion/update", data, options).map(
       (response:Response) => {
         const data = response;
+        return data;
+      }
+    );
+  }
+
+  getServiceById(data){
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions ({ headers: headers });
+    return this.http.post(this.url+"/services/servicebyId", data, options).map(
+      (response:Response) => {
+        const data = response.json();
+        return data;
+      }
+    );
+  }
+
+  changeServiceState(data){
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions ({ headers: headers });
+    return this.http.post(this.url+"/services/changeServiceStatus", data, options).map(
+      (response:Response) => {
+        const data = response.json();
         return data;
       }
     );

@@ -3,6 +3,7 @@ import {AlertController, NavController, NavParams} from 'ionic-angular';
 import {AppShipmentService} from "../../app/services/appShipment.service";
 import {GoogleMapServices} from "../../app/services/googleMap.services";
 import { Geolocation } from 'ionic-native';
+import {Home} from "../home/home.component";
 
 declare let google;
 
@@ -12,6 +13,7 @@ declare let google;
 export class Tracking implements OnInit{
 
   @ViewChild('map') mapElement: ElementRef;
+  @ViewChild('directionsPanel') directionsElement: ElementRef;
   map: any;
   markerOrigen: any;
   markerDestino: any;
@@ -28,13 +30,23 @@ export class Tracking implements OnInit{
   user:any;
   activeService:any;
   transporterPosTask:any;
+  packagePickedUp:boolean;
+  deliveredPackage:boolean;
+  arrivalTime:any;
+  loading:boolean;
+  addresses:any;
 
   constructor(public navCtrl: NavController, private appShipmentService:AppShipmentService, private alertCtrl: AlertController,
-              private navParams:NavParams, private googleMapServide:GoogleMapServices,
+              private navParams:NavParams, private googleMapServices:GoogleMapServices,
               private changeDetection: ChangeDetectorRef) {
+    this.loading = false;
+    this.packagePickedUp=false;
+    this.deliveredPackage=false;
     this.markerSelected=false;
     this.markerTrans;
     this.markerOrigen = null;
+    this.arrivalTime = null;
+    this.addresses = {origen:{}, destino:{}};
     this.iconUserDetailFrom = {url: '../assets/icon/userPos.png'};
     this.iconUserDetailTo = {url: '../assets/icon/userPos2.png'};
     this.iconTransDetail = {url: '../assets/icon/carPos.png'};
@@ -117,26 +129,73 @@ export class Tracking implements OnInit{
     this.markerTrans = this.putMarker(this.map, this.markerTrans, pos, this.iconTransDetail);
   }
 
-  getDirections(){
+  pickUpPackage(markerFrom, markerTo){
+    this.packagePickedUp = true;
+    this.getDirections(markerFrom, markerTo);
+  }
+
+  deliveryPackage(markerFrom, markerTo){
+    this.loading = true;
+    let data = {
+      idService: this.activeService.idService,
+      idUser: this.activeService.idUser,
+      idTrans: this.activeService.idTransporter,
+      state:"ST"
+    };
+    this.appShipmentService.changeServiceState(data).subscribe(
+      (response) => {
+        if(response) {
+          this.loading = false;
+          this.deliveredPackage=true;
+          this.getDirections(markerFrom, markerTo);
+          markerFrom.setMap(null);
+        }
+      }
+    );
+  }
+
+  finishService(){
+    this.loading = true;
+    let data = {
+      idService: this.activeService.idService,
+      idUser: this.activeService.idUser,
+      idTrans: this.activeService.idTransporter,
+      state:"FI"
+    };
+    this.appShipmentService.changeServiceState(data).subscribe(
+      (response) => {
+        if(response) {
+          this.loading = false;
+          clearInterval(this.transporterPosTask);
+          this.navCtrl.setRoot(Home, {user:this.user});
+        }
+      }
+    );
+  }
+
+  getDirections(markerFrom, markerTo){
     console.log("getting directions!");
     let request = {
-      origin:this.markerOrigen.position,
-      destination:this.markerDestino.position,
+      origin:markerFrom.position,
+      destination:markerTo.position,
       travelMode: google.maps.DirectionsTravelMode.DRIVING
     };
     this.directionsService.route(request, (response, status)=>{
       this.directionsResult = response;
       this.directionsStatus = status;
-      this.printDirections()
+      this.printDirections(markerFrom, markerTo);
     });
   };
 
-  printDirections(){
+  printDirections(markerFrom, markerTo){
     if (this.directionsStatus === "OK"){
-      this.markerOrigen.setMap(null);
-      this.markerDestino.setMap(null);
+      if(this.directionsResult.routes.length>0 ){
+        this.arrivalTime = this.directionsResult.routes[0].legs[0].duration.text;
+      }
       this.directionsRender.setMap(this.map);
       this.directionsRender.setDirections(this.directionsResult);
+      this.changeDetection.detectChanges();
+      //this.directionsRender.setPanel(this.directionsElement.nativeElement);
     }
     else {
       alert("Cant retrieve routes");
@@ -164,11 +223,29 @@ export class Tracking implements OnInit{
         this.appShipmentService.updateLatLng(data).subscribe(
           (response) => {
             console.log(response);
-            this.getTransporterPos();
+            this.updateServiceData();
           }
         );
       });
   };
+
+  updateServiceData(){
+    this.addresses.origen = this.activeService.origen;
+    this.addresses.destino = this.activeService.destino;
+    this.appShipmentService.getServiceById(this.activeService).subscribe(
+      (response)=>{
+        this.activeService = response[0];
+        console.log(this.activeService);
+        this.updateServiceAddresses();
+        this.updateTransporterMarker();
+      }
+    );
+  }
+
+  updateServiceAddresses(){
+    this.activeService.origen = this.addresses.origen;
+    this.activeService.destino = this.addresses.destino;
+  }
 
   updateTransporterMarker(){
     let pos = new google.maps.LatLng(this.activeService.transporter.pos.lat, this.activeService.transporter.pos.lng);

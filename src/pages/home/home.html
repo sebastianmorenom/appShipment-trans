@@ -18,34 +18,34 @@
         <ion-fab top center edge>
           <button ion-fab (click)="createService()"><ion-icon name="add"></ion-icon></button>
         </ion-fab>
-        <ion-row>
-          <ion-col col-11>
-            <ion-item>
-              <ion-label color="primary" stacked>Dirección origen</ion-label>
-              <ion-input placeholder="Cra 123 # 32 65" disabled [value]="markerOrigenAddress"></ion-input>
-            </ion-item>
-          </ion-col>
-          <ion-col col-1>
-            <ion-fab center middle="">
-              <button ion-fab mini [color]="(markerOption==1)?'primary':'light'"
-                      (click)="changeMarkersPosition(1)"><ion-icon name="locate"></ion-icon></button>
-            </ion-fab>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col col-11>
-            <ion-item>
-              <ion-label color="primary" stacked>Dirección destino</ion-label>
-              <ion-input placeholder="Cra 123 # 32 65"  disabled [value]="markerDestinoAddress"></ion-input>
-            </ion-item>
-          </ion-col>
-          <ion-col col-1>
-            <ion-fab center middle="">
-              <button ion-fab mini [color]="(markerOption==2)?'primary':'light'"
-                      (click)="changeMarkersPosition(2)"><ion-icon name="locate"></ion-icon></button>
-            </ion-fab>
-          </ion-col>
-        </ion-row>
+        <!--<ion-row>-->
+          <!--<ion-col col-11>-->
+            <!--<ion-item>-->
+              <!--<ion-label color="primary" stacked>Dirección origen</ion-label>-->
+              <!--<ion-input placeholder="Cra 123 # 32 65" disabled [value]="markerOrigenAddress"></ion-input>-->
+            <!--</ion-item>-->
+          <!--</ion-col>-->
+          <!--<ion-col col-1>-->
+            <!--<ion-fab center middle="">-->
+              <!--<button ion-fab mini [color]="(markerOption==1)?'primary':'light'"-->
+                      <!--(click)="changeMarkersPosition(1)"><ion-icon name="locate"></ion-icon></button>-->
+            <!--</ion-fab>-->
+          <!--</ion-col>-->
+        <!--</ion-row>-->
+        <!--<ion-row>-->
+          <!--<ion-col col-11>-->
+            <!--<ion-item>-->
+              <!--<ion-label color="primary" stacked>Dirección destino</ion-label>-->
+              <!--<ion-input placeholder="Cra 123 # 32 65"  disabled [value]="markerDestinoAddress"></ion-input>-->
+            <!--</ion-item>-->
+          <!--</ion-col>-->
+          <!--<ion-col col-1>-->
+            <!--<ion-fab center middle="">-->
+              <!--<button ion-fab mini [color]="(markerOption==2)?'primary':'light'"-->
+                      <!--(click)="changeMarkersPosition(2)"><ion-icon name="locate"></ion-icon></button>-->
+            <!--</ion-fab>-->
+          <!--</ion-col>-->
+        <!--</ion-row>-->
       </ion-col>
     </ion-row>
   </ion-grid>

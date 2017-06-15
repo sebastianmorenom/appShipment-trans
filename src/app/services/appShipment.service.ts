@@ -5,13 +5,13 @@ import 'rxjs/RX';
 @Injectable()
 export class AppShipmentService {
 
-  private url:String = "http://localhost:9000";
+  private url:String = "http://192.168.0.4:9000";
   //private url:String = "http://54.157.227.139:9000";
 
   constructor (private http:Http){}
 
   login(data){
-    let headers = new Headers({ 'Content-Type': 'application/json' , 'Access-Control-Allow-Origin':'*'});
+    let headers = new Headers({ 'Content-Type': 'application/json'});
     let options = new RequestOptions ({ headers: headers });
     return this.http.post(this.url+"/login", data, options).map(
       (response:Response) => {

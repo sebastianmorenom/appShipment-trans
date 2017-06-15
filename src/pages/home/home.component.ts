@@ -3,6 +3,7 @@ import {AlertController, NavController, NavParams} from 'ionic-angular';
 import { Geolocation } from 'ionic-native';
 import {AppShipmentService} from "../../app/services/appShipment.service";
 import {GoogleMapServices} from "../../app/services/googleMap.services";
+import {Tracking} from "../tracking/tracking.component";
 
 declare let google;
 
@@ -31,9 +32,13 @@ export class Home implements OnInit{
   data:any;
   user:any;
   locations:any;
+  findServiceTask:any;
+  transporterPosTask:any;
+  activeService:any;
+  addresses:any;
 
   constructor(public navCtrl: NavController, private appShipmentService:AppShipmentService, private alertCtrl: AlertController,
-              private navParams:NavParams, private googleMapServide:GoogleMapServices,
+              private navParams:NavParams, private googleMapServices:GoogleMapServices,
               private changeDetection: ChangeDetectorRef) {
     this.markerSelected=false;
     this.locations = {from:{}, to:{}};
@@ -44,6 +49,12 @@ export class Home implements OnInit{
     this.iconTransDetail = {url: '../assets/icon/carPos.png'};
     this.iconTrans = {url: '../assets/icon/car.png'};
     this.user = navParams.get('user');
+    this.findServiceTask = setInterval(() => {
+      this.findService();
+    }, 5000);
+    this.transporterPosTask = setInterval(()=>{
+      this.setTransporterPos();
+    },5000);
   }
 
   ngOnInit(){
@@ -58,7 +69,7 @@ export class Home implements OnInit{
       (position) => {
         let centerMap = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
         //let centerMap = new google.maps.LatLng(4.670191, -74.058528);
-        this.getTransporters(position);
+        //this.getTransporters(position);
         let mapOptions = {
           center: centerMap,
           zoom: 15,
@@ -84,18 +95,10 @@ export class Home implements OnInit{
   };
 
   addMarkerCenterMap(opt){
-    if( opt === 1 ){
-      if(this.markerOrigen){
-        this.markerOrigen.setMap(null);
-      }
-      this.markerOrigen = this.putMarker(this.map, this.markerOrigen, this.map.getCenter(), this.iconUserDetailFrom);
+    if(this.markerOrigen){
+      this.markerOrigen.setMap(null);
     }
-    if( opt === 2 ){
-      if(this.markerDestino){
-        this.markerDestino.setMap(null);
-      }
-      this.markerDestino = this.putMarker(this.map, this.markerDestino, this.map.getCenter(), this.iconUserDetailTo);
-    }
+    this.markerOrigen = this.putMarker(this.map, this.markerOrigen, this.map.getCenter(), this.iconTransDetail);
   }
 
   addMarkerWithPos(opt, pos){
@@ -196,7 +199,7 @@ export class Home implements OnInit{
   }
 
   getAddressFromPos(opt, lat, lng){
-    this.googleMapServide.getAddressFromLatLng(lat, lng).subscribe(
+    this.googleMapServices.getAddressFromLatLng(lat, lng).subscribe(
       (data) => {
         if(opt==1){
           this.markerOrigenAddress = data.results[0].formatted_address;
@@ -209,11 +212,72 @@ export class Home implements OnInit{
     );
   }
 
+  findService(){
+    console.log("finding services")
+    this.appShipmentService.getActiveService(this.user).subscribe(
+      (response:any) => {
+        if (response.length > 0) {
+          this.activeService = response[0];
+          console.log(this.activeService)
+          if (this.activeService.status !== "FI"){
+            clearInterval(this.findServiceTask);
+            clearInterval(this.transporterPosTask);
+            this.presentAlert();
+          }
+        }
+      }
+    );
+  }
+
+  getFormattedAddresses(){
+    this.googleMapServices.getAddressFromLatLng(this.activeService.origen.lat, this.activeService.origen.lng).subscribe(
+      dataOrigen => {
+        this.activeService.origen.address = dataOrigen.results[0].formatted_address;
+        this.googleMapServices.getAddressFromLatLng(this.activeService.destino.lat, this.activeService.destino.lng).subscribe(
+          dataDestino => {
+            this.activeService.destino.address = dataDestino.results[0].formatted_address;
+            this.navCtrl.setRoot(Tracking, {user:this.user, activeService:this.activeService});
+          }
+        )
+      }
+    );
+  }
+
+  setTransporterPos(){
+    Geolocation.getCurrentPosition().then(
+      (position) => {
+        let data = {
+          username:this.user.username,
+          lat:position.coords.latitude,
+          lng:position.coords.longitude
+        };
+        this.appShipmentService.updateLatLng(data).subscribe(
+          (response) => {
+            console.log(response);
+            this.updateTransporterMarker(data.lat, data.lng);
+          }
+        );
+      });
+  };
+
+  updateTransporterMarker(lat, lng){
+    let pos = new google.maps.LatLng(lat,lng);
+    this.markerOrigen.setPosition(pos);
+    this.map.panTo(pos);
+  }
+
   presentAlert() {
     let alert = this.alertCtrl.create({
-      title: 'Para donde vamos?!',
-      subTitle: 'Por favor, asegurece de poner el marcador de origen y destino en el mapa para continuar.',
-      buttons: ['OK']
+      title: 'Servicio encontrado!!',
+      subTitle: 'Se a solicitado un servicio dentro de tu alcance.',
+      buttons: [
+        {
+          text: 'OK',
+          handler: () => {
+            this.getFormattedAddresses();
+          }
+        }
+      ]
     });
     alert.present();
   }

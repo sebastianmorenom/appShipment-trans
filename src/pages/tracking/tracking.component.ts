@@ -79,7 +79,7 @@ export class Tracking implements OnInit{
     this.loadTransMasrker(transPos);
     this.transporterPosTask = setInterval(()=>{
       this.setTransporterPos();
-    },10000);
+    },5000);
   };
 
   addMarkerCenterMap(opt){
